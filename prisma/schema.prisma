@@ -29,6 +29,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
+  role              String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -58,6 +59,7 @@ model User {
   posts             Post[]
   comments          Comment[]
   commentVotes      CommentVote[]
+  role              String?
 }
 
 model Subreddit {
@@ -93,6 +95,8 @@ model Post {
   subredditId String    @db.ObjectId
   comments    Comment[]
   votes       Vote[]
+  flag        Boolean?
+  flagType    String?
 }
 
 model Comment {

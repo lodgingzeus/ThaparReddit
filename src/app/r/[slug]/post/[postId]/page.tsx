@@ -1,7 +1,9 @@
 import CommentsSection from '@/components/CommentsSection'
 import EditorOutput from '@/components/EditorOutput'
+import FlagMenu from '@/components/FlagMenu'
 import PostVoteServer from '@/components/post-vote/PostVoteServer'
 import { buttonVariants } from '@/components/ui/Button'
+import { getAuthSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { redis } from '@/lib/redis'
 import { formatTimeToNow } from '@/lib/utils'
@@ -21,9 +23,20 @@ export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
 const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
+
+  const session = await getAuthSession()
+
   const cachedPost = (await redis.hgetall(
     `post:${params.postId}`
   )) as CachedPost
+
+  let user = await db.user.findFirst({
+    where: {
+      role: 'admin'
+    }
+  })
+
+  const isAdmin = session?.user.id === user?.id ? true : false
 
   let post: (Post & { votes: Vote[]; author: User }) | null = null
 
@@ -40,6 +53,9 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
   }
 
   if (!post && !cachedPost) return notFound()
+
+  const isAuthor = session?.user.id === (post?.authorId)  
+    
 
   return (
     <div>
@@ -61,7 +77,14 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
           />
         </Suspense>
 
-        <div className='sm:w-0 w-full flex-1 bg-white p-4 rounded-sm'>
+        <div className='sm:w-0 w-full flex-1 bg-white p-4 rounded-sm relative'>
+
+          <FlagMenu 
+          postId={post?.id ?? cachedPost.id} 
+          isAuthor={isAuthor}
+          isAdmin={isAdmin} 
+          />
+
           <p className='max-h-40 mt-1 truncate text-xs text-gray-500'>
             Posted by u/{post?.author.username ?? cachedPost.authorUsername}{' '}
             {formatTimeToNow(new Date(post?.createdAt ?? cachedPost.createdAt))}
