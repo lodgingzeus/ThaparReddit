@@ -79,13 +79,19 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
 
         <div className='sm:w-0 w-full flex-1 bg-white p-4 rounded-sm relative'>
 
+
           <FlagMenu 
           postId={post?.id ?? cachedPost.id} 
           isAuthor={isAuthor}
           isAdmin={isAdmin} 
           />
+          {post?.flagType && (
+              <div className="absolute top-0 left-4 mt-1 bg-red-100 text-red-700 text-xs font-bold rounded-full px-4 py-1 shadow-md">
+                {post.flagType}
+              </div>
+          )}
 
-          <p className='max-h-40 mt-1 truncate text-xs text-gray-500'>
+          <p className='max-h-40 mt-4 truncate text-xs text-gray-500'>
             Posted by u/{post?.author.username ?? cachedPost.authorUsername}{' '}
             {formatTimeToNow(new Date(post?.createdAt ?? cachedPost.createdAt))}
           </p>
