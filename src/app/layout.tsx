@@ -9,7 +9,7 @@ import '@/styles/globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Thapar Reddit',
+  title: 'Thapar Forums',
   description: 'A Reddit Type community for Thapar University',
 }
 
