@@ -3,12 +3,16 @@ import { db } from '@/lib/db'
 import { PostValidator } from '@/lib/validators/post'
 import { z } from 'zod'
 
-const checkForVulgularWords = (sentence : any, words : any) => {
+import vulgarWords from '../../../../../../random/vulgular.json'
+console.log(vulgarWords)
+const checkForVulgarWords = (sentence: any) => {
+  const words = vulgarWords.map((item) => item.Word);
   const regex = new RegExp(`\\b(${words.join("|")})\\b`, "i");
   return regex.test(sentence);
-}
+};
 
-const vulgularWords = ['chutiya', 'mkc', 'bhosdike']
+
+// const vulgularWords = ['chutiya', 'mkc', 'bhosdike']
 
 export async function POST(req: Request) {
   try {
@@ -18,7 +22,7 @@ export async function POST(req: Request) {
 
     const textToCheck = content.blocks[0].data.text
 
-    if(checkForVulgularWords(textToCheck, vulgularWords)) {
+    if(checkForVulgarWords(textToCheck)) {
       return new Response('Your Post contains banned words', {status: 403})
     }else{
       const session = await getAuthSession()
